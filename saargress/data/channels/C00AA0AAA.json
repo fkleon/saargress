@@ -1,0 +1,56 @@
+{
+    "created": 1412896209,
+    "creator": "U00BBBBB0",
+    "id": "C02P36C7L",
+    "is_archived": false,
+    "is_channel": true,
+    "is_general": false,
+    "is_member": false,
+    "members": [
+        "U00BBBBB0",
+        "U00CCCCC0"
+    ],
+    "messages": [
+        {
+            "subtype": "channel_join",
+            "text": "<@U00BBBBB0|admin> has joined the channel",
+            "ts": "1412896209.000002",
+            "type": "message",
+            "user": "U00BBBBB0"
+        },
+        {
+            "purpose": "channel purpose!!",
+            "subtype": "channel_purpose",
+            "text": "<@UU00BBBBB0|admin> set the channel purpose: channel purpose!!",
+            "ts": "1412896210.000003",
+            "type": "message",
+            "user": "U00BBBBB0"
+        },
+        {
+            "text": "a message",
+            "ts": "1412896334.000004",
+            "type": "message",
+            "user": "U00BBBBB0"
+        },
+        {
+            "inviter": "U00BBBBB0",
+            "subtype": "channel_join",
+            "text": "<@U00CCCCC0|user> has joined the channel",
+            "ts": "1412896346.000005",
+            "type": "message",
+            "user": "U00CCCCC0"
+        }
+    ],
+    "name": "test",
+    "num_members": 2,
+    "purpose": {
+        "creator": "U00BBBBB0",
+        "last_set": "1412896210",
+        "value": "channel purpose!!"
+    },
+    "topic": {
+        "creator": "",
+        "last_set": "0",
+        "value": ""
+    }
+}
