@@ -24,23 +24,21 @@ part 'src/auth.dart';
 part 'src/rest.dart';
 
 SlackDatabase _slackDB;
-String _oAuthClientId;
 
 /// Starts the Saargress server with the given parameters
-void start(String ip, int port, {String importDir, String oAuthClientId}) {
-  _oAuthClientId = oAuthClientId;
+void start(String host, int port, String oAuthClientId, {String importDir}) {
   if(importDir != null) {
     SlackImporter.buildFromDir(importDir).then((sdb) {
         _slackDB = sdb;
         log.info('Initialized SlackDB: ${_slackDB.toJson()}');
-      }).then((_) => _startServer(ip, port));
+      }).then((_) => _startServer(host, port, oAuthClientId));
   } else {
     _slackDB = new SlackDatabase.empty();
-    _startServer(ip, port);
+    _startServer(host, port, oAuthClientId);
   }
 }
 
-void _startServer(String host, int port) {
+void _startServer(String host, int port, String oAuthClientId) {
   // Authentication via GoogleOAuth and Slack User DB
   SlackUserLookup sul = new SlackUserLookup(_slackDB.users);
 
@@ -48,13 +46,13 @@ void _startServer(String host, int port) {
           sul.lookupByEmail);
 
   var authMiddleware = authenticate(
-      [new GoogleOAuth2Authenticator(_oAuthClientId, sul)],
+      [new GoogleOAuth2Authenticator(oAuthClientId, sul)],
       sessionHandler: jwtSessionHandler,
       allowAnonymousAccess: false,
       allowHttp: true); //TODO disable allowHttp
 
   var authMiddlewareAnon = authenticate(
-      [new GoogleOAuth2Authenticator(_oAuthClientId, sul)],
+      [new GoogleOAuth2Authenticator(oAuthClientId, sul)],
       sessionHandler: jwtSessionHandler,
       allowAnonymousAccess: true,
       allowHttp: true); //TODO disable allowHttp
@@ -72,7 +70,8 @@ void _startServer(String host, int port) {
       .addHandler(rootRouter.handler);
 
   shelf_io.serve(handler, host, port).then((server) {
-     log.info('Serving at http://${server.address.host}:${server.port}');
+    log.info('Using OAuth client ID: $oAuthClientId');
+    log.info('Serving at http://${server.address.host}:${server.port}');
   });
 }
 
