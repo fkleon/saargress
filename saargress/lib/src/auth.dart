@@ -13,7 +13,7 @@ class SlackUserLookup {
   Future<Option<Principal>> lookupByEmail(String email) {
     Iterable<SlackUser> users = _admins.where((user) => user.email == email);
 
-    if(users.isEmpty || users.length > 1) {
+    if(users == null || users.isEmpty || users.length > 1) {
       //TODO
       new Future.value(const None());
     }

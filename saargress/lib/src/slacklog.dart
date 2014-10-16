@@ -65,7 +65,7 @@ class SlackMessage {
   String userId;
   DateTime ts;
 
-  SlackMessage.build(this.id, {this.userId, this.text, this.type}) {
+  SlackMessage.build(this.id, {this.userId, this.text, this.type: 'message'}) {
     this.ts = new DateTime.now();
   }
 
@@ -257,8 +257,9 @@ class SlackImporter {
         Future fileFuture = _readFile(file, slackDB);
         fileFutures.add(fileFuture);
        },
+       onError: (e) => completer.completeError(e),
        // Wait on all files to be parsed before completing
-       onDone: () => Future.wait(fileFutures).then((_) => completer.complete(slackDB)));
+       onDone: () => completer.isCompleted ? '' : Future.wait(fileFutures).then((_) => completer.complete(slackDB)));
 
      return completer.future;
    }
