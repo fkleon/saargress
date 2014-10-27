@@ -1,0 +1,16 @@
+<!-- import polymer-element's definition -->
+<link rel="import" href="../../../packages/polymer/polymer.html">
+<link rel="import" href="../../../packages/core_elements/core_signals.html">
+
+<polymer-element name="google-signin-aware" attributes="scopes">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <!-- Template content here -->
+    <core-signals on-core-signal-google-auth-success="{{authSuccess}}"></core-signals>
+  </template>
+  <script type="application/dart" src="google_signin_aware.dart"></script>
+</polymer-element>

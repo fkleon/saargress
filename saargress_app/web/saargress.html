@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Saargress</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="images/saargress.ico">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <link rel="import" href="packages/polymer/polymer.html">
+    <link rel="import" href="packages/saargress_app/elements/google_signin.html">
+    <link rel="import" href="packages/saargress_app/elements/slack_app.html">
+    <script src="packages/browser/dart.js"></script>
+  </head>
+
+  <body unresolved>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1>Ingress Resistance Saarland</h1>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <google-signin  width="wide" scopes="profile email" autoLogin="true"
+                          clientId="174261543240-642cqpgd7rgqbcigeh3i25psrkdcbm67.apps.googleusercontent.com">
+          </google-signin>
+          <slack-app></slack-app>
+        </div>
+      </div>
+    </div>
+    <script type="application/dart">export "package:polymer/init.dart";</script>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+<!-- import polymer-element's definition -->
+<link rel="import" href="../../../packages/polymer/polymer.html">
+<link rel="import" href="google_signin_aware.html">
+<link rel="import" href="../../../packages/core_elements/core_list_dart.html">
+
+<polymer-element name="slack-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      @import '/assets/css/bootstrap.min.css';
+    </style>
+    <!-- Template content here -->
+    <google-signin-aware
+      scopes="profile email"
+      on-google-signin-aware-success="{{signedIn}}"></google-signin-aware>
+
+      <template if={{sAPI.isAuthed}}>
+        <hr/>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="input-group">
+                <span class="input-group-addon">#</span>
+                <select class="form-control" value={{searchChannel}}>
+                  <option value="{{channel}}" template repeat="{{channel in channels}}">
+                    {{channel}}
+                  </option>
+                </select>
+                <!--
+                <div class="dropdown">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown">
+                    Dropdown
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
+                  </ul>
+                </div>
+                -->
+                <!--
+                <span class="input-group-addon">#</span>
+                <input type="text" class="form-control" placeholder="Channel" value="{{searchChannel}}">
+                -->
+              </div>
+            </div>
+            <div class="col-md-7">
+              <div class="input-group">
+                <span class="input-group-addon">@</span>
+                <input type="text" class="form-control" placeholder="Text" value="{{searchTerm}}">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <button id="search" on-click="{{search}}" type="button" class="btn btn-primary">
+                Search
+              </button>
+            </div>
+          </div>
+        <hr/>
+
+        <div class="row">
+          <div class="col-md-12">
+            <template if={{messages.isNotEmpty}}>
+              <core-list-dart id="list" data="{{messages}}" selectionEnabled="false" height="100" flex>
+                <template>
+                  <!--<div class="{{ {item: true, selected: selected} }}">-->
+                    <li class="message list-group-item">
+                      <h4>
+                        [[userName]]
+                        <small>[[date]]</small>
+                      </h4>
+                      <span class="body">[[text]]</span>
+                    </li>
+                  <!-- </div>-->
+                </template>
+            </core-list-dart>
+          </template>
+          <template if={{messages.isEmpty}}>
+            {{searchMessage}}
+          </template>
+          </div>
+        </div>
+      </template>
+  </template>
+  <script type="application/dart" src="slack_app.dart"></script>
+</polymer-element>
