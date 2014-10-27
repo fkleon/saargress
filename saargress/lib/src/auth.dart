@@ -74,7 +74,7 @@ class GoogleOAuth2Authenticator<P extends Principal> extends Authenticator<P> {
 
   /// Extracts the authentication informations from the request header
   TokenInfo _extractCredentials(shelf.Request request) {
-    log.info('Authenticating: ${request.headers.toString()}');
+    log.fine('[auth] Authenticating: ${request.headers.toString()}');
 
     String tokenHeaders = request.headers["X-Saargress-Auth"];
     if(tokenHeaders == null || tokenHeaders.isEmpty) {
@@ -106,7 +106,9 @@ class GoogleOAuth2Authenticator<P extends Principal> extends Authenticator<P> {
   /// Query whether this token is still valid.
   Future<TokenInfo> _validate(String clientId, String userId, String tokenData,
       {String service: "https://www.googleapis.com/oauth2/v1/tokeninfo"}) {
-    log.info("Validating authorization for user '$userId' with tokenData '$tokenData'..");
+    log.info("[auth] Validating authorization for user '$userId' with tokenData '$tokenData'..");
+
+    //TODO use googleapis.oauth2.v2.tokeninfo()
     String url = "${service}?access_token=${tokenData}";
 
     var completer = new Completer();
@@ -138,6 +140,7 @@ class GoogleOAuth2Authenticator<P extends Principal> extends Authenticator<P> {
       } else {
         String email = data['email'];
         TokenInfo authedInfo = new TokenInfo(tokenData, userId, email);
+        log.info("[auth] Validation successful for user '$userId' with email '$email'!");
         return new Future.value(authedInfo);
       }
     });
