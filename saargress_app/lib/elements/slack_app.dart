@@ -63,6 +63,7 @@ class SlackApp extends PolymerElement {
 
   /// Prints the error message
   _handleError(e) {
+    messages.clear();
     searchMessage = '${e.target.statusText}: ${e.target.responseText}';
   }
 
