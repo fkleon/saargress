@@ -169,7 +169,7 @@ class SlackDatabase {
         if(message.userName == null) {
           Iterable<SlackUser> matchingUsers = users.where((user) => user.id == message.userId);
           if(matchingUsers.isEmpty) {
-            message.userName = 'Unknown ({$message.userId})';
+            message.userName = 'Unknown (${message.userId})';
           } else {
             message.userName = matchingUsers.first.name;
           }
