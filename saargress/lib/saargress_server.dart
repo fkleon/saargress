@@ -30,6 +30,7 @@ void start(String host, int port, String oAuthClientId, {String importDir}) {
   if(importDir != null) {
     SlackImporter.buildFromDir(importDir).then((sdb) {
         _slackDB = sdb;
+        sdb.updateUserNames();
         log.info('Initialized SlackDB: ${_slackDB.toJson()}');
       }).then((_) => _startServer(host, port, oAuthClientId));
   } else {

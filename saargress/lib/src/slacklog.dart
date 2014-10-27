@@ -63,6 +63,7 @@ class SlackMessage {
   String id;
   String text, type;
   String userId;
+  String userName;
   DateTime ts;
 
   SlackMessage.build(this.id, {this.userId, this.text, this.type: 'message'}) {
@@ -84,6 +85,7 @@ class SlackMessage {
       'text': text,
       'type': type,
       'user': userId,
+      'userName': userName,
       'ts': ts.toIso8601String()
   };
 
@@ -160,6 +162,21 @@ class SlackDatabase {
 
   /// Adds the given slack user to the database
   addUser(SlackUser su) => users.add(su);
+
+  void updateUserNames() {
+    for(SlackLog log in logs) {
+      for(SlackMessage message in log.messages) {
+        if(message.userName == null) {
+          Iterable<SlackUser> matchingUsers = users.where((user) => user.id == message.userId);
+          if(matchingUsers.isEmpty) {
+            message.userName = 'Unknown ({$message.userId})';
+          } else {
+            message.userName = matchingUsers.first.name;
+          }
+        }
+      }
+    }
+  }
 
   /// Finds a slack log by its id (e.g. channel or group name)
   SlackLog findLogByName(String name) {
