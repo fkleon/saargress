@@ -16,6 +16,13 @@
       scopes="profile email"
       on-google-signin-aware-success="{{signedIn}}"></google-signin-aware>
 
+      <template if={{authMessage.isNotEmpty}}>
+        <p class="text-danger">
+          Failed to authenticate against Saargress:<br/>
+          {{authMessage}}
+        </p>
+      </template>
+
       <template if={{sAPI.isAuthed}}>
         <hr/>
           <div class="row">

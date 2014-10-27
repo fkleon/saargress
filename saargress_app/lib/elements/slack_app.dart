@@ -9,6 +9,7 @@ import 'package:polymer/polymer.dart';
 class SlackApp extends PolymerElement {
 
   @observable SaargressAPI sAPI;
+  @observable String authMessage;
 
   @observable String searchChannel;
   @observable String searchTerm = 'test';
@@ -37,7 +38,7 @@ class SlackApp extends PolymerElement {
     sAPI = new SaargressAPI()
         ..authReady(detail).then(
             (_) => populateChannels(),
-            onError: (e) => print('ERROR authing at Saargress: ${e.toString()}')); //TODO error handling
+            onError: (e) => _handleError(e));
   }
 
   /// Called by the search button
@@ -64,7 +65,12 @@ class SlackApp extends PolymerElement {
   /// Prints the error message
   _handleError(e) {
     messages.clear();
-    searchMessage = '${e.target.statusText}: ${e.target.responseText}';
+
+    if(e.target != null && e.target.status == 401) {
+      authMessage = '${e.target.statusText}: ${e.target.responseText}';
+    }
+
+    searchMessage = 'Search failed.';
   }
 
   /*
