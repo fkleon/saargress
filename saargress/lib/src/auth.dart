@@ -14,8 +14,9 @@ class SlackUserLookup {
     Iterable<SlackUser> users = _admins.where((user) => user.email == email);
 
     if(users == null || users.isEmpty || users.length > 1) {
-      //TODO
-      new Future.value(const None());
+      log.info('[SlackUserLookup] \'$email\' is not authorized to access Saargress.');
+      //return new Future.value(const None());
+      throw new UnauthorizedException({"message": "User '$email' not authorized."});
     }
 
     final SlackUser user = users.first;
@@ -106,7 +107,7 @@ class GoogleOAuth2Authenticator<P extends Principal> extends Authenticator<P> {
   /// Query whether this token is still valid.
   Future<TokenInfo> _validate(String clientId, String userId, String tokenData,
       {String service: "https://www.googleapis.com/oauth2/v1/tokeninfo"}) {
-    log.info("[auth] Validating authorization for user '$userId' with tokenData '$tokenData'..");
+    log.fine("[GoogleOAuth2Authenticator] Validating authorization for user '$userId' with tokenData '$tokenData'..");
 
     //TODO use googleapis.oauth2.v2.tokeninfo()
     String url = "${service}?access_token=${tokenData}";
@@ -135,12 +136,15 @@ class GoogleOAuth2Authenticator<P extends Principal> extends Authenticator<P> {
        * for another user.
        */
       final validUserId = userId == data['user_id'];
+
+      final String email = data['email'];
+
       if(!validAudience || !validUserId) {
+        log.warning("[GoogleOAuth2Authenticator] Validation failed for user '$userId' with email '$email'!");
         throw new UnauthorizedException({"message": "Authorization failed - invalid token."});
       } else {
-        String email = data['email'];
         TokenInfo authedInfo = new TokenInfo(tokenData, userId, email);
-        log.info("[auth] Validation successful for user '$userId' with email '$email'!");
+        log.info("[GoogleOAuth2Authenticator] Validation successful for user '$userId' with email '$email'!");
         return new Future.value(authedInfo);
       }
     });
