@@ -51,20 +51,13 @@ void _startServer(String host, int port, String oAuthClientId) {
       allowAnonymousAccess: false,
       allowHttp: true); //TODO disable allowHttp
 
-  var authMiddlewareAnon = authenticate(
-      [new GoogleOAuth2Authenticator(oAuthClientId, sul)],
-      sessionHandler: jwtSessionHandler,
-      allowAnonymousAccess: true,
-      allowHttp: true); //TODO disable allowHttp
-
   var rootRouter = router()
       ..addAll(bindResource(new SlackLogResource()), path: '/logs')
-      ..add("/auth", ["GET"], _authRequest)
-      ..add("/info", ["GET"], _infoRequest, middleware: authMiddlewareAnon);
+      ..add("/auth", ["GET"], _authRequest);
 
   var handler = const shelf.Pipeline()
       .addMiddleware(corsHeaderMiddleware)
-      //.addMiddleware(shelf.logRequests())
+      .addMiddleware(shelf.logRequests())
       .addMiddleware(exceptionResponse())
       .addMiddleware(authMiddleware)
       .addHandler(rootRouter.handler);
