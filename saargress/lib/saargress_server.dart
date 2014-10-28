@@ -26,20 +26,20 @@ part 'src/rest.dart';
 SlackDatabase _slackDB;
 
 /// Starts the Saargress server with the given parameters
-void start(String host, int port, String oAuthClientId, {String importDir}) {
+void start(String host, int port, String oAuthClientId, {String importDir, bool secure:false}) {
   if(importDir != null) {
     SlackImporter.buildFromDir(importDir).then((sdb) {
         _slackDB = sdb;
         sdb.updateUserNames();
         log.info('Initialized SlackDB: ${_slackDB.toJson()}');
-      }).then((_) => _startServer(host, port, oAuthClientId));
+      }).then((_) => _startServer(host, port, oAuthClientId, secure));
   } else {
     _slackDB = new SlackDatabase.empty();
-    _startServer(host, port, oAuthClientId);
+    _startServer(host, port, oAuthClientId, secure);
   }
 }
 
-void _startServer(String host, int port, String oAuthClientId) {
+void _startServer(String host, int port, String oAuthClientId, bool secure) {
   // Authentication via GoogleOAuth and Slack User DB
   SlackUserLookup sul = new SlackUserLookup(_slackDB.users);
 
@@ -63,10 +63,30 @@ void _startServer(String host, int port, String oAuthClientId) {
       .addMiddleware(authMiddleware)
       .addHandler(rootRouter.handler);
 
-  shelf_io.serve(handler, host, port).then((server) {
-    log.info('Using OAuth client ID: $oAuthClientId');
-    log.info('Serving at http://${server.address.host}:${server.port}');
-  });
+  if(secure) {
+    _initSecureSocket();
+
+    HttpServer.bindSecure(host, port, certificateName: 'CN=dartcert').then((server) {
+      shelf_io.serveRequests(server, handler);
+      log.info('Using OAuth client ID: $oAuthClientId');
+      log.info('Serving at https://${server.address.host}:${server.port}');
+    });
+  } else {
+    shelf_io.serve(handler, host, port).then((server) {
+      log.info('Using OAuth client ID: $oAuthClientId');
+      log.info('Serving at http://${server.address.host}:${server.port}');
+    });
+  }
+}
+
+void _initSecureSocket() {
+  //var testPkcertDatabase = Platform.script.resolve('pkcert')
+  //                                   .toFilePath();
+  var pkcertDatabase = '/home/freddy/dev/workspaces/dartspace/saargress/saargress/pkcert';
+  var pwd = new File(pkcertDatabase+'/pwdfile').readAsStringSync();
+  pwd = pwd.substring(0, pwd.length-1);
+  SecureSocket.initialize(database: pkcertDatabase,
+                          password: pwd);
 }
 
 /// Info about auth status

@@ -23,7 +23,9 @@ void start(
             help: 'The port to use, e.g. "8080".')
     int port: DEFAULT_PORT,
     @Option(help: 'A directory containing the slack dump to be imported on startup.')
-    String slackDir}
+    String slackDir,
+    @Flag(abbr: 's', help: 'Start the server in secure mode (https).')
+    bool secure: false}
   ) {
 
   // Logging
@@ -33,7 +35,7 @@ void start(
   });
 
   // Go!
-  saargress.start(host, port, clientId, importDir: slackDir);
+  saargress.start(host, port, clientId, importDir: slackDir, secure: secure);
 }
 
 String _validateGoogleOAuth2ClientId(String clientId) {
