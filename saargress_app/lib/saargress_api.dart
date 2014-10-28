@@ -54,7 +54,7 @@ class SaargressAPI extends Observable {
   /// is stored for future requests.
   Future<String> _authUser(String userAccessToken, String googleUserId) {
     Map xAuthHeader = _getXAuthHeader(userAccessToken, googleUserId);
-    return HttpRequest.request('http://localhost:8081/auth', requestHeaders: xAuthHeader, withCredentials: true).then((req) {
+    return HttpRequest.request('${_saargressHost}/auth', requestHeaders: xAuthHeader, withCredentials: true).then((req) {
       String _authHeader = req.getResponseHeader('authorization');
       print(_authHeader);
       return _authHeader;
