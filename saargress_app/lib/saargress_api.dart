@@ -49,6 +49,12 @@ class SaargressAPI extends Observable {
       });
   }
 
+  void signOut() {
+    _saargressAuthHeader = null;
+    _googleAccessCredentials = null;
+    isAuthed = false;
+  }
+
   /// Initially auths the user against the saargress server based on the Google OAuth token.
   /// If auth was successfull, the auth header (with the saargress access token)
   /// is stored for future requests.
@@ -89,7 +95,7 @@ class SaargressAPI extends Observable {
         });
   }
 
-  // Searches for logs
+  /// Searches for logs
   Future<List> searchLog(String channelName) {
     return _authedRequest('${_saargressHost}/logs?name=${channelName}').then((contents) {
           List msgs = JSON.decode(contents);

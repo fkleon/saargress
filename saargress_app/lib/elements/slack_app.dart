@@ -41,6 +41,14 @@ class SlackApp extends PolymerElement {
             onError: (e) => _handleError(e));
   }
 
+  /// Called on google-auth-signed-out (core signal)
+  signedOut(e, detail, sender) {
+    // Detail should contain TOAccessCredential (json)
+    var credentials = detail['credentials'];
+    print('(slack-app) Signed out from saargress - sender: $sender, detail: ${credentials}');
+    sAPI.signOut();
+  }
+
   /// Called by the search button
   search(e, var detail, target) {
     e.preventDefault();
