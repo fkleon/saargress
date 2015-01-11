@@ -59,8 +59,8 @@ class GoogleSignin extends PolymerElement {
   @observable String errorMessage = '';
   //@observable get hasError => errorMessage.isNotEmpty;
 
-  /// If the user is authed, the client is stored here
-  auth.AuthClient _client;
+  /// If the user is authed, the access credentials are stored here
+  auth.AccessCredentials _creds;
 
   var defaultHandler;
 
@@ -107,34 +107,34 @@ class GoogleSignin extends PolymerElement {
 
   /// Tries to sign in an user via implicit browser flow:
   ///
-  /// Obtains an authorized client and fires the google-auth-sucess
+  /// Obtains an access credential and fires the google-auth-sucess
   /// event when successful. The event contains an AccessCredentials
   /// object.
-  Future _signIn(Element elem) {
+  Future<auth.AccessCredentials> _signIn(Element elem) {
     auth.ClientId identifier = new auth.ClientId(clientId, null);
-    return authorizedClient(elem, identifier, scopesList).then((client) {
-          _client = client;
+    return accessCredentials(elem, identifier, scopesList).then((credentials) {
+          _creds = credentials;
 
-          List<String> authorizedScopes = client.credentials.scopes; //TODO remove
+          List<String> authorizedScopes = credentials.scopes; //TODO remove
           print('(google-signin) Authorized for scopes: $authorizedScopes');
 
           this.asyncFire('core-signal', detail: {
               'name': 'google-auth-success',
-              'data': { 'tokenData': client.credentials.accessToken.data,
+              'data': { 'tokenData': credentials.accessToken.data,
                         'scopes': authorizedScopes,
-                        'credentials': new TOAccessCredential.fromAC(client.credentials).toJson()
+                        'credentials': new TOAccessCredential.fromAC(credentials).toJson()
               }
             });
           //this.fire('google-signin-success', detail: {'result': 'success', 'gapi': client});
           signedIn = true;
-          return client;
-        }, onError: (e) => print('(google-signin) ERROR obtaining authorized client: $e'));
+          return credentials;
+        }, onError: (e) => print('(google-signin) ERROR obtaining access credentials: $e'));
   }
 
   /// Called by the sign out button:
   /// Revokes the access rights.
   void signOut(Event e, var details, Node target) {
-    if(_client == null) {
+    if(_creds == null) {
       print('(google-signin) User is not signed in.');
       errorMessage = 'User is not signed in.';
       return;
@@ -144,15 +144,24 @@ class GoogleSignin extends PolymerElement {
     context['processData'] = () {
       print('(google-signin) User signed out.');
       this.asyncFire('core-signal', detail: {
+        'name': 'google-auth-signed-out',
+        'data': { 'tokenData': _creds.accessToken.data,
+                  //'credentials': _creds.toString()
+                  'credentials': new TOAccessCredential.fromAC(_creds).toJson()
+        }
+      });
+      /*
+      this.asyncFire('core-signal', detail: {
           'name': 'google-auth-signed-out',
-          'data': {'gapi': client}
+          'data': {'gapi': _client}
         });
+      */
       this.errorMessage = 'User signed out.';
       this.signedIn = false;
     };
 
     ScriptElement script = new Element.tag("script");
-    script.src = "https://accounts.google.com/o/oauth2/revoke?token=${_client.credentials.accessToken.data}&callback=processData";
+    script.src = "https://accounts.google.com/o/oauth2/revoke?token=${_creds.accessToken.data}&callback=processData";
     document.body.children.add(script);
 
     /// Fails due to CORS:
@@ -160,7 +169,7 @@ class GoogleSignin extends PolymerElement {
     /// No 'Access-Control-Allow-Origin' header is present on the requested resource.
     /// Origin 'http://127.0.0.1:8080' is therefore not allowed access.
     /*
-    String revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=${_client.credentials.accessToken.data}';
+    String revokeUrl = 'https://accounts.google.com/o/oauth2/revoke?token=${_creds.accessToken.data}';
     HttpRequest.request(revokeUrl, method: 'GET', requestHeaders: {'Content-Type': 'application/json'}).then((req) {
       if(req.status != 200) {
         print("ERORR");
@@ -174,6 +183,9 @@ class GoogleSignin extends PolymerElement {
 
   /// Tries to obtain an authorized client via implicit browser flow
   /// or user consent.
+  ///
+  /// Deprecated: Use accessCredentials() instead.
+  @deprecated
   Future<auth.AuthClient> authorizedClient(Element loginElement, auth.ClientId id, List scopes) {
     return auth.createImplicitBrowserFlow(id, scopes)
        .then((auth.BrowserOAuth2Flow flow) {
@@ -188,6 +200,24 @@ class GoogleSignin extends PolymerElement {
        });
      }, test: (error) => error is auth.UserConsentException);
     });
+  }
+
+  /// Tries to obtain access credentials via implicit browser flow
+  /// or user consent
+  Future<auth.AccessCredentials> accessCredentials(Element loginElement, auth.ClientId id, List scopes) {
+    return auth.createImplicitBrowserFlow(id, scopes)
+      .then((auth.BrowserOAuth2Flow flow) {
+        return flow.obtainAccessCredentialsViaUserConsent(immediate: false).catchError((e) {
+          print('(google-signin) ERROR accessCredentials(): $e');
+          errorMessage = e.toString();
+          return loginElement.onClick.first.then((_) {
+            return flow.obtainAccessCredentialsViaUserConsent(immediate: true).then((auth.AccessCredentials creds) {
+              flow.close();
+              return creds;
+            });
+          });
+        }, test: (error) => error is auth.UserConsentException);
+      });
   }
 
   /*
