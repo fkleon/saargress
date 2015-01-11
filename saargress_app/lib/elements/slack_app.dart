@@ -34,7 +34,7 @@ class SlackApp extends PolymerElement {
   /// Called on google-signin-aware-success
   signedIn(e, detail, sender) {
     // Detail should be TOAccessCredential
-    print('Sign in successfully into saargress: $sender, $detail');
+    print('(slack-app) Sign in successfully into saargress - sender: $sender, detail: $detail');
     sAPI = new SaargressAPI()
         ..authReady(detail).then(
             (_) => populateChannels(),
@@ -62,7 +62,7 @@ class SlackApp extends PolymerElement {
     }, onError: (e) => _handleError(e));
   }
 
-  /// Prints the error message
+  /// Prints the error message to the user
   _handleError(e) {
     messages.clear();
 

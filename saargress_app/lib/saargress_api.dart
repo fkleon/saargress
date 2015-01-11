@@ -34,7 +34,7 @@ class SaargressAPI extends Observable {
 
     var api = new oauth2.Oauth2Api(authClient);
     return api.userinfo.get().then((userInfo) {
-        print("Hello ${userInfo.name} (${userInfo.email})!");
+        print("(saargress-api) Hello ${userInfo.name} (${userInfo.email})!");
 
         var gAccessToken = accessCredentials.accessToken.data;
         var gId = userInfo.id;
@@ -56,7 +56,7 @@ class SaargressAPI extends Observable {
     Map xAuthHeader = _getXAuthHeader(userAccessToken, googleUserId);
     return HttpRequest.request('${_saargressHost}/auth', requestHeaders: xAuthHeader, withCredentials: true).then((req) {
       String _authHeader = req.getResponseHeader('authorization');
-      print(_authHeader);
+      print("(saargress-api) Auth Header: '$_authHeader'");
       return _authHeader;
      });
   }

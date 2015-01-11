@@ -16,7 +16,7 @@ class GoogleSigninAware extends PolymerElement {
 
   void authSuccess(e, detail, sender) {
     if(detail == null) {
-      print('Illegal message, null detail.');
+      print('(google-signin-aware) Illegal message, null detail.');
       return;
     }
     // Check if correct scopes authorized, if not do nothing and continue to wait
@@ -38,10 +38,10 @@ class GoogleSigninAware extends PolymerElement {
     }
 
     if(complete) {
-      print('All ready!');
+      print('(google-signin-aware) All ready!');
       this.fire('google-signin-aware-success', detail: credentials);
     } else {
-      print('Missing scopes!');
+      print('(google-signin-aware) Missing scopes!');
     }
   }
 

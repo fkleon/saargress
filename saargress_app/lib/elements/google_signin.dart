@@ -89,13 +89,13 @@ class GoogleSignin extends PolymerElement {
 
     if(autoLogin) {
       Element signInBtn = $['signInBtn'];
-      _signIn(signInBtn).then((_) => print('Automatically signed in!'));
+      _signIn(signInBtn).then((_) => print('(google-signin) Automatically signed in!'));
     }
   }
 
   /// Called when a google-signin-aware element requests auth for some scopes
   void authRequest(e, scopes, sender) {
-    print('$sender requested auth for scopes: $scopes');
+    print('(google-signin) $sender requested auth for scopes: ${scopes.split(' ')} [not implemented yet]');
     //_signIn(elem);
     //TODO
   }
@@ -116,7 +116,7 @@ class GoogleSignin extends PolymerElement {
           _client = client;
 
           List<String> authorizedScopes = client.credentials.scopes; //TODO remove
-          print('Authorized for scopes: $authorizedScopes');
+          print('(google-signin) Authorized for scopes: $authorizedScopes');
 
           this.asyncFire('core-signal', detail: {
               'name': 'google-auth-success',
@@ -128,21 +128,21 @@ class GoogleSignin extends PolymerElement {
           //this.fire('google-signin-success', detail: {'result': 'success', 'gapi': client});
           signedIn = true;
           return client;
-        }, onError: (e) => print('ERROR: $e'));
+        }, onError: (e) => print('(google-signin) ERROR obtaining authorized client: $e'));
   }
 
   /// Called by the sign out button:
   /// Revokes the access rights.
   void signOut(Event e, var details, Node target) {
     if(_client == null) {
-      print('User is not signed in.');
+      print('(google-signin) User is not signed in.');
       errorMessage = 'User is not signed in.';
       return;
     }
 
     // Create a jsObject to handle the response.
     context['processData'] = () {
-      print('User signed out.');
+      print('(google-signin) User signed out.');
       this.asyncFire('core-signal', detail: {
           'name': 'google-auth-signed-out',
           'data': {'gapi': client}
@@ -178,7 +178,7 @@ class GoogleSignin extends PolymerElement {
     return auth.createImplicitBrowserFlow(id, scopes)
        .then((auth.BrowserOAuth2Flow flow) {
      return flow.clientViaUserConsent(immediate: false).catchError((e) {
-       print('authorizedClient(): $e');
+       print('(google-signin) ERROR authorizedClient(): $e');
        errorMessage = e.toString();
        return loginElement.onClick.first.then((_) {
          return flow.clientViaUserConsent(immediate: true);
