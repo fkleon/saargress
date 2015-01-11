@@ -38,6 +38,8 @@ void start(
   saargress.start(host, port, clientId, importDir: slackDir, secure: secure);
 }
 
+/// Shallow validation of a given clientId
+/// Assures that the id is not null and ends with '.apps.googleusercontent.com'
 String _validateGoogleOAuth2ClientId(String clientId) {
   if(clientId == null || !clientId.endsWith('.apps.googleusercontent.com')) {
     throw 'must not be empty and conform to "<client-id>.apps.googleusercontent.com"';

@@ -163,6 +163,7 @@ class SlackDatabase {
   /// Adds the given slack user to the database
   addUser(SlackUser su) => users.add(su);
 
+  /// Assigns user names to messages by looking up names by user id
   void updateUserNames() {
     for(SlackLog log in logs) {
       for(SlackMessage message in log.messages) {
@@ -214,6 +215,12 @@ class SlackDatabase {
     } else {
       return foundUsers.first;
     }
+  }
+
+  /// Clears the underlying database
+  void clear() {
+    logs.clear();
+    users.clear();
   }
 
   /// Returns the total number of messages in this database

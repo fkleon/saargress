@@ -105,12 +105,11 @@ class GoogleOAuth2Authenticator<P extends Principal> extends Authenticator<P> {
   }
 
   /// Query whether this token is still valid.
-  Future<TokenInfo> _validate(String clientId, String userId, String tokenData,
-      {String service: "https://www.googleapis.com/oauth2/v1/tokeninfo"}) {
+  Future<TokenInfo> _validate(String clientId, String userId, String tokenData) {
     log.fine("[GoogleOAuth2Authenticator] Validating authorization for user '$userId' with tokenData '$tokenData'..");
 
     //TODO use googleapis.oauth2.v2.tokeninfo()
-    String url = "${service}?access_token=${tokenData}";
+    String url = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${tokenData}";
 
     var completer = new Completer();
 
