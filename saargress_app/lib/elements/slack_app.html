@@ -9,7 +9,10 @@
       :host {
         display: block;
       }
-      @import '/assets/css/bootstrap.min.css';
+      .spinner {
+        background: url('packages/saargress_app/assets/spinner.gif') no-repeat center center;
+      }
+      @import 'packages/bootjack/css/bootstrap.min.css';
     </style>
     <!-- Template content here -->
     <google-signin-aware
@@ -58,7 +61,7 @@
             <div class="col-md-7">
               <div class="input-group">
                 <span class="input-group-addon">@</span>
-                <input type="text" class="form-control" placeholder="Text" value="{{searchTerm}}">
+                <input type="text" class="form-control" placeholder="text" value="{{searchTerm}}">
               </div>
             </div>
             <div class="col-md-2">
