@@ -177,11 +177,11 @@ class GoogleSignin extends PolymerElement {
   Future<auth.AuthClient> authorizedClient(Element loginElement, auth.ClientId id, List scopes) {
     return auth.createImplicitBrowserFlow(id, scopes)
        .then((auth.BrowserOAuth2Flow flow) {
-     return flow.clientViaUserConsent(forceUserConsent: false).catchError((e) {
+     return flow.clientViaUserConsent(immediate: false).catchError((e) {
        print('authorizedClient(): $e');
        errorMessage = e.toString();
        return loginElement.onClick.first.then((_) {
-         return flow.clientViaUserConsent(forceUserConsent: true);
+         return flow.clientViaUserConsent(immediate: true);
        });
      }, test: (error) => error is auth.UserConsentException);
     });
