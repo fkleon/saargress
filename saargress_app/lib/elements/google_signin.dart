@@ -181,7 +181,10 @@ class GoogleSignin extends PolymerElement {
        print('(google-signin) ERROR authorizedClient(): $e');
        errorMessage = e.toString();
        return loginElement.onClick.first.then((_) {
-         return flow.clientViaUserConsent(immediate: true);
+         return flow.clientViaUserConsent(immediate: true).then((auth.AuthClient client) {
+           flow.close();
+           return client;
+         });
        });
      }, test: (error) => error is auth.UserConsentException);
     });
