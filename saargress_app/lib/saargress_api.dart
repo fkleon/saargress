@@ -22,6 +22,9 @@ class SaargressAPI extends Observable {
 
   @observable bool isAuthed = false;
 
+  /// Tries to sign in user into Saargress based on the given Google access
+  /// credentials.
+  /// May throw an HttpException or String exception.
   Future authReady(accessCredentials) {
     if(accessCredentials == null) {
       throw 'AccessCredentials cannot be null.';
@@ -42,6 +45,7 @@ class SaargressAPI extends Observable {
         return _authUser(gAccessToken, gId).then((authHeader) {
           _saargressAuthHeader = authHeader;
           isAuthed = true;
+          print('(saargress-api) Sign in successfully into Saargress!');
           });
       }).whenComplete(() {
         authClient.close();
@@ -53,6 +57,7 @@ class SaargressAPI extends Observable {
     _saargressAuthHeader = null;
     _googleAccessCredentials = null;
     isAuthed = false;
+    print('(slack-app) Signed out from Saargress!');
   }
 
   /// Initially auths the user against the saargress server based on the Google OAuth token.
@@ -64,7 +69,8 @@ class SaargressAPI extends Observable {
       String _authHeader = req.getResponseHeader('authorization');
       print("(saargress-api) Auth Header: '$_authHeader'");
       return _authHeader;
-     });
+     }).catchError((e) => throw "Unknown error while connecting to Saargress server, please try again.",
+         test: (e) => e.target != null && e.target.status == 0); // Something went wront requesting auth, i.e. connection was refused
   }
 
   /// Constructs the initial custom saargress auth header
@@ -102,5 +108,4 @@ class SaargressAPI extends Observable {
           return msgs;
         });
   }
-
 }

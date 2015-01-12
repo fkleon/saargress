@@ -34,18 +34,18 @@ class SlackApp extends PolymerElement {
   /// Called on google-signin-aware-success
   signedIn(e, detail, sender) {
     // Detail should be TOAccessCredential
-    print('(slack-app) Sign in successfully into saargress - sender: $sender, detail: $detail');
+    print('(slack-app) Sign in successfully with Google - sender: $sender, detail: $detail');
     sAPI = new SaargressAPI()
-        ..authReady(detail).then(
-            (_) => populateChannels(),
-            onError: (e) => _handleError(e));
+        ..authReady(detail).then((_) => populateChannels())
+            //, onError: (e) => _handleHttpError(e))
+          .catchError((e) => _handleConnectionError(e), test: (e) => e is String); // custom conn error
   }
 
   /// Called on google-auth-signed-out (core signal)
   signedOut(e, detail, sender) {
     // Detail should contain TOAccessCredential (json)
     var credentials = detail['credentials'];
-    print('(slack-app) Signed out from saargress - sender: $sender, detail: ${credentials}');
+    print('(slack-app) Signed out from Google - sender: $sender, detail: ${credentials}');
     sAPI.signOut();
   }
 
@@ -67,18 +67,26 @@ class SlackApp extends PolymerElement {
         //new SlackChannelItem.fromJson(channel)));
       this.channels.sort();
       this.searchChannel = this.channels.first;
-    }, onError: (e) => _handleError(e));
+    }, onError: (e) => _handleHttpError(e));
   }
 
-  /// Prints the error message to the user
-  _handleError(e) {
+  /// Prints the HTTP error message to the user
+  _handleHttpError(e) {
+    print('(slack-app) HTTP Error: $e (Status ${e.target.statusText}, Response Text: ${e.target.responseText})');
     messages.clear();
 
-    if(e.target != null && e.target.status == 401) {
+    if(e.target != null && (e.target.status == 401 || e.target.status == 404 || e.target.status == 500)) {
       authMessage = '${e.target.statusText}: ${e.target.responseText}';
     }
 
     searchMessage = 'Search failed.';
+  }
+
+  /// Prints the string error message to the user
+  _handleConnectionError(String e) {
+    print('(slack-app) Connection Error: $e');
+    messages.clear();
+    authMessage = e;
   }
 
   /*
